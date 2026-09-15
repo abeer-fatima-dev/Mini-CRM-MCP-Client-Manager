@@ -189,6 +189,28 @@ Every tool returns a structured result. Successful results contain `"ok": true`;
 
 It is an MCP resource, not a tool, because it provides read-only information and does not perform an operation or modify data.
 
+## Inspector screenshots
+
+The screenshots below show the connected MCP Inspector interface for this project.
+
+### Available CRM tools
+
+The **Tools** view exposes the five CRM operations: `add_client`, `list_clients`, `get_client`, `update_client`, and `delete_client`.
+
+![MCP Inspector tools view](screenshots/inspector-tools.png)
+
+### Client resource
+
+The **Resources** view shows the `clients://all` resource and its JSON response.
+
+![MCP Inspector clients resource](screenshots/inspector-resource.png)
+
+### Prompts view
+
+The Inspector includes a **Prompts** view as part of its general MCP interface. This project does not define custom prompts, so the list is intentionally empty.
+
+![MCP Inspector prompts view](screenshots/inspector-prompts.png)
+
 ## Storage behavior
 
 All records are stored in `clients.json` using Python's standard `json` module. The file can start as an empty array:
