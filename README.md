@@ -1,130 +1,246 @@
 # Mini CRM / Client Manager MCP Server
 
-A beginner-friendly [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for managing local client records. MCP gives an AI application a standard way to discover and call tools provided by another program. This project uses the Python MCP SDK and stores data in one local `clients.json` file.
+Mini CRM is a local Model Context Protocol (MCP) server for managing client records. An MCP client, such as MCP Inspector, can discover the server's tools and resource and then use them through the standard MCP protocol.
 
-## Project structure
+The project is intentionally small and beginner-friendly:
 
-```text
-server.py         MCP server, storage helpers, five tools, and one resource
-clients.json      Local client data (kept in the assignment)
-requirements.txt  Python dependency
-DEMO_PLAN.md      Short Inspector demonstration script
-VIVA_ANSWERS.md  Beginner viva questions and answers
-.gitignore        Local Python files excluded from Git
+- Python MCP SDK `2.2.0`
+- Python `3.14`
+- stdio transport
+- local JSON storage
+- no database, cloud service, authentication, frontend, or AI framework
+
+## What the server provides
+
+### MCP tools
+
+| Tool | Purpose |
+|---|---|
+| `add_client` | Create a new client |
+| `list_clients` | List all clients or filter by status |
+| `get_client` | Retrieve one client by ID |
+| `update_client` | Update one or more client fields |
+| `delete_client` | Delete a client by ID |
+
+### MCP resource
+
+| Resource URI | Purpose |
+|---|---|
+| `clients://all` | Read-only JSON view of all current clients |
+
+This server does not define custom MCP prompts. The Inspector may still display a **Prompts** tab because it is a general MCP client, but the CRM functionality is provided by the five tools and the resource above.
+
+## Client data model
+
+Each record has this shape:
+
+```json
+{
+  "id": 1,
+  "name": "Ali Khan",
+  "email": "ali@example.com",
+  "phone": "03001234567",
+  "company": "ABC Solutions",
+  "status": "lead"
+}
 ```
 
-## Prerequisites
+Allowed statuses are `lead`, `active`, and `inactive`. IDs are generated automatically as positive integers. Email addresses must be valid and unique.
 
-- Windows 11 (the commands below use PowerShell)
-- Python 3.10 or newer (tested with Python 3.14)
-- Node.js and `npx` (MCP Inspector uses them)
-- `uv` is optional; the Python virtual-environment commands below use `venv`
+## Project files
 
-## Setup on Windows
+```text
+server.py         MCP server, tools, resource, validation, and JSON storage
+clients.json      Local client records
+requirements.txt  Python dependency declaration
+README.md         Project documentation
+DEMO_PLAN.md      Short live demonstration plan
+VIVA_ANSWERS.md  Beginner-friendly viva answers
+.gitignore        Files excluded from version control
+```
 
-From this project folder:
+## Installation
+
+Open a PowerShell terminal in the project folder:
 
 ```powershell
+cd "C:\Users\IT LAND\Downloads\Mini_CRM_MCP_Complete\mini_crm_mcp"
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 ```
 
-If PowerShell blocks activation, run `Set-ExecutionPolicy -Scope Process Bypass` in that terminal and activate again. The dependency is `mcp>=2,<3`, which matches the current SDK used by this project.
+The project requires the `mcp` Python package. The included virtual environment already contains the compatible SDK. The activation step is optional when using the explicit virtual-environment command shown below.
 
-## Run and test with MCP Inspector
+## Running with MCP Inspector
 
-Start the development server and Inspector:
+The reliable Windows command for this project is:
 
 ```powershell
-mcp dev server.py
+npx --yes @modelcontextprotocol/inspector .\venv\Scripts\python.exe .\server.py
 ```
 
-The command starts the server over stdio and launches the Inspector. If `mcp` is not on PATH, use `.\venv\Scripts\mcp.exe dev server.py`. The server can also be started directly with `python server.py`, although Inspector is the easiest way to test it.
+This starts MCP Inspector and launches `server.py` with the Python executable from the project virtual environment. It does not depend on a globally installed `uv` command.
 
-In Inspector:
+The terminal prints a URL similar to:
 
-1. Leave the transport as **stdio** and confirm the command is `python` (or select the project virtual-environment Python).
-2. Set the argument to `server.py` if Inspector asks for a server script, then click **Connect**.
-3. Open **Tools** and confirm `add_client`, `list_clients`, `get_client`, `update_client`, and `delete_client`.
-4. Use **Tools** to call each function with the examples below.
-5. Open **Resources**, select `clients://all`, and click **Read resource**.
+```text
+http://127.0.0.1:6274/?MCP_INSPECTOR_API_TOKEN=...
+```
 
-## MCP tools
+Open that URL in a browser. In Inspector:
+
+1. Find the `python.exe` server entry.
+2. Click its connection switch.
+3. Wait for the status to show **Connected**.
+4. Select **Tools** to use the five CRM tools.
+5. Select **Resources**, choose `all_clients`, and read `clients://all`.
+
+If port `6274` is already in use, an Inspector instance is already running. Open `http://127.0.0.1:6274` or stop the old Inspector terminal with `Ctrl+C` before starting a new one.
+
+To run only the MCP server without Inspector:
+
+```powershell
+.\venv\Scripts\python.exe .\server.py
+```
+
+That command is useful for a direct server check, but Inspector is required for the graphical demonstration.
+
+## Tool inputs and examples
 
 ### `add_client`
 
-Required: `name`, `email`. Optional: `phone`, `company`, `status` (default `lead`). Status must be `lead`, `active`, or `inactive`; email addresses must be unique.
+Required inputs: `name`, `email`.
+
+Optional inputs: `phone`, `company`, and `status`. The default status is `lead`.
 
 ```json
-{"name":"Ali Khan","email":"ali@example.com","phone":"03001234567","company":"ABC Solutions","status":"lead"}
+{
+  "name": "Sara Ahmed",
+  "email": "sara@technova.com",
+  "phone": "03001234567",
+  "company": "TechNova",
+  "status": "lead"
+}
 ```
 
 ### `list_clients`
 
-Optional `status` defaults to `all`; use `all`, `lead`, `active`, or `inactive`.
+Optional input: `status`. Use `all`, `lead`, `active`, or `inactive`. The default is `all`.
 
 ```json
-{"status":"lead"}
+{
+  "status": "lead"
+}
 ```
 
 ### `get_client`
 
-Requires a positive integer `client_id`.
+Required input: positive integer `client_id`.
 
 ```json
-{"client_id":1}
+{
+  "client_id": 1
+}
 ```
 
 ### `update_client`
 
-Requires `client_id` and at least one of `name`, `email`, `phone`, `company`, or `status`. Unsupplied fields are preserved.
+Required input: `client_id` and at least one update field. Available update fields are `name`, `email`, `phone`, `company`, and `status`. Fields that are not supplied remain unchanged.
 
 ```json
-{"client_id":1,"status":"active"}
+{
+  "client_id": 1,
+  "status": "active"
+}
 ```
 
 ### `delete_client`
 
-Requires the positive integer ID to remove.
+Required input: positive integer `client_id`.
 
 ```json
-{"client_id":1}
+{
+  "client_id": 1
+}
 ```
 
-All tools return a structured dictionary with `ok: true` on success or `ok: false` and an understandable `error` message on validation, missing-record, storage, or duplicate-email failures. Examples include an empty name, `ali` as an invalid email, status `waiting`, ID `0`, ID `9999`, and an update with no fields.
+Every tool returns a structured result. Successful results contain `"ok": true`; validation and missing-record results contain `"ok": false` and a readable error message. The server handles empty names, invalid emails, duplicate emails, invalid statuses, invalid IDs, unknown IDs, and empty update requests without crashing.
 
-## Read-only resource
+## Reading `clients://all`
 
-`clients://all` returns a JSON snapshot containing `count` and every current client. It is a resource rather than a tool because it only exposes information and does not perform a CRM action or modify data.
+`clients://all` returns a JSON document like this:
 
-## Storage and IDs
+```json
+{
+  "count": 1,
+  "clients": [
+    {
+      "id": 1,
+      "name": "Sara Ahmed",
+      "email": "sara@technova.com",
+      "phone": "03001234567",
+      "company": "TechNova",
+      "status": "lead"
+    }
+  ]
+}
+```
 
-`clients.json` starts as `[]`. The server reads and writes it with Python’s standard `json` module. A missing or empty file is treated as an empty CRM; malformed JSON is reported as a storage error. IDs are positive integers generated from the highest existing ID plus one. No database, cloud service, authentication, frontend framework, or AI framework is used.
+It is an MCP resource, not a tool, because it provides read-only information and does not perform an operation or modify data.
 
-## Example workflow
+## Storage behavior
 
-An assistant can interpret “Add Sara Ahmed from TechNova as a lead and show me all leads” by calling `add_client`, then `list_clients` with `{"status":"lead"}`. Later it can call `update_client` with `{"client_id":1,"status":"active"}` and `get_client` to confirm the change.
+All records are stored in `clients.json` using Python's standard `json` module. The file can start as an empty array:
+
+```json
+[]
+```
+
+A missing or empty file is treated as an empty CRM. Malformed JSON or a file that does not contain a list of client objects is reported as a storage error. No external database is used.
+
+## Example CRM workflow
+
+1. Call `add_client` to create Sara Ahmed as a lead.
+2. Call `list_clients` with `{"status": "lead"}` to show all leads.
+3. Call `update_client` with `{"client_id": 1, "status": "active"}` when Sara becomes a customer.
+4. Call `get_client` to confirm the updated record.
+5. Read `clients://all` to view the complete current CRM.
 
 ## Troubleshooting
 
-- **`mcp` is not recognized:** activate the venv or use `.\venv\Scripts\mcp.exe dev server.py`.
-- **Inspector cannot connect:** run the command from the folder containing `server.py`, select stdio, and use the venv Python.
-- **No tools appear:** reconnect Inspector and check that the server process has no Python traceback.
-- **Duplicate email:** use a different email or update the existing record.
-- **Unexpected old records:** inspect or reset `clients.json` to `[]` only when you intentionally want to clear the lab data.
+### Inspector opens but the server is disconnected
 
-## GitHub submission
-
-Create a repository, add the project files (including `clients.json`), and push the project:
+Use the explicit command below from the project folder and click the `python.exe` connection switch in Inspector:
 
 ```powershell
-git init
-git add server.py clients.json requirements.txt README.md DEMO_PLAN.md VIVA_ANSWERS.md .gitignore
-git commit -m "Build Mini CRM MCP server"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-git push -u origin main
+npx --yes @modelcontextprotocol/inspector .\venv\Scripts\python.exe .\server.py
 ```
 
-Do not commit `venv`, `.env`, or Python cache files; `.gitignore` already excludes them.
+### The terminal says port 6274 is already in use
+
+Open the existing Inspector at `http://127.0.0.1:6274`, or stop the previous Inspector terminal with `Ctrl+C`. Do not start many Inspector instances at the same time.
+
+### The old Inspector entry says `uv` is not recognized
+
+That entry uses an old `uv` launch command. Disconnect it and start Inspector with the explicit Python command above. This project does not require `uv`.
+
+### Tools or resources do not appear
+
+Confirm that Inspector says **Connected**, then reconnect the `python.exe` entry. The expected tools are `add_client`, `list_clients`, `get_client`, `update_client`, and `delete_client`; the expected resource URI is `clients://all`.
+
+### A client already exists
+
+Email addresses are intentionally unique. Use another email address or update the existing client.
+
+## GitHub
+
+The files that belong in the repository are:
+
+```powershell
+git add server.py clients.json requirements.txt README.md DEMO_PLAN.md VIVA_ANSWERS.md .gitignore
+git commit -m "Build Mini CRM MCP server"
+git push
+```
+
+Do not commit the `venv` directory, `.env` files, or Python cache files. They are excluded by `.gitignore`.
