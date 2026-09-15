@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Sara Ahmed",
+    "email": "sara@technova.com",
+    "phone": "03001234567",
+    "company": "TechNova",
+    "status": "lead"
+  },
+  {
+    "id": 2,
+    "name": "Abeer Fatima",
+    "email": "abeerfatima6167@gmail.com",
+    "phone": "",
+    "company": "",
+    "status": "lead"
+  },
+  {
+    "id": 3,
+    "name": "Wasfa Hamza",
+    "email": "wasfanasir124@gmail.com",
+    "phone": "",
+    "company": "",
+    "status": "lead"
+  }
+]
