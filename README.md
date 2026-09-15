@@ -1,8 +1,8 @@
 # Mini CRM / Client Manager MCP Server
 
-Mini CRM is a local Model Context Protocol (MCP) server for managing client records. An MCP client, such as MCP Inspector, can discover the server's tools and resource and then use them through the standard MCP protocol.
+Mini CRM is a local Model Context Protocol (MCP) server for managing client records. An MCP client, such as MCP Inspector, can discover the server's tools and resource and use them through the standard MCP protocol.
 
-The project is intentionally small and beginner-friendly:
+The project provides a focused implementation with:
 
 - Python MCP SDK `2.2.0`
 - Python `3.14`
@@ -233,14 +233,6 @@ Confirm that Inspector says **Connected**, then reconnect the `python.exe` entry
 
 Email addresses are intentionally unique. Use another email address or update the existing client.
 
-## GitHub
+## Scope
 
-The files that belong in the repository are:
-
-```powershell
-git add server.py clients.json requirements.txt README.md DEMO_PLAN.md VIVA_ANSWERS.md .gitignore
-git commit -m "Build Mini CRM MCP server"
-git push
-```
-
-Do not commit the `venv` directory, `.env` files, or Python cache files. They are excluded by `.gitignore`.
+This project is designed for local development and demonstration with MCP Inspector. It intentionally does not include authentication, a web interface, a cloud service, or an external database. The local JSON file keeps the implementation transparent and easy to inspect while demonstrating the complete MCP tool and resource workflow.
